@@ -3,7 +3,7 @@ HuatuoGPT-Vision 모델 래퍼 (최신 Transformers 4.42+ 호환 버전)
 """
 
 import torch
-from transformers import AutoProcessor, AutoModelForVision2Seq
+from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
 import warnings
 
