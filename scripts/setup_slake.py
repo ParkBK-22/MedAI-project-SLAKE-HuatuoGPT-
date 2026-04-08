@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-def run_command(command):
+def run_command(command, shell_type="powershell"):
     """터미널 명령어를 실행하고 결과를 출력합니다."""
     print(f"Executing: {command}")
     try:
@@ -10,43 +10,106 @@ def run_command(command):
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while executing: {command}")
         print(e)
-        sys.exit(1)
+        return False
+    return True
 
 def main():
-    print("=== Starting SLAKE Project Setup ===")
+    print("=" * 60)
+    print("SLAKE Project Setup")
+    print("=" * 60)
 
     # 1. 필수 폴더 생성
-    folders = ['data', 'results', 'checkpoints', 'results/viz']
+    print("\n[1/5] Creating directories...")
+    folders = [
+        'data',
+        'data/slake',
+        'results',
+        'checkpoints',
+        'results/viz'
+    ]
     for folder in folders:
         if not os.path.exists(folder):
             os.makedirs(folder)
-            print(f"Created directory: {folder}")
+            print(f"  ✓ Created: {folder}")
+        else:
+            print(f"  • Already exists: {folder}")
 
-    # 2. 데이터 다운로드 스크립트 실행 권한 부여 및 실행
-    # (data/download_data.sh가 이미 존재한다고 가정)
-    if os.path.exists('data/download_data.sh'):
-        print("\n--- Downloading Dataset ---")
-        run_command("chmod +x data/download_data.sh")
-        run_command("./data/download_data.sh")
-    else:
-        print("Warning: data/download_data.sh not found. Skipping data download.")
-
-    # 3. 환경 검증 (PyTorch 및 CUDA)
-    print("\n--- Verifying Environment ---")
+    # 2. 환경 검증 (PyTorch 및 CUDA)
+    print("\n[2/5] Verifying PyTorch & CUDA...")
     try:
         import torch
-        print(f"PyTorch Version: {torch.__version__}")
-        print(f"CUDA Available: {torch.cuda.is_available()}")
+        print(f"  ✓ PyTorch Version: {torch.__version__}")
+        print(f"  ✓ CUDA Available: {torch.cuda.is_available()}")
         if torch.cuda.is_available():
-            print(f"GPU: {torch.cuda.get_device_name(0)}")
+            print(f"  ✓ GPU: {torch.cuda.get_device_name(0)}")
     except ImportError:
-        print("PyTorch is not installed. Please run 'pip install -r requirements_base.txt' first.")
+        print("  ⚠ Warning: PyTorch is not installed.")
+        print("     Run: pip install -r requirements_base.txt")
 
-    # 4. .gitkeep 생성 (빈 폴더 유지를 위해)
-    with open('results/.gitkeep', 'w') as f:
-        pass
+    # 3. 필수 Python 패키지 확인
+    print("\n[3/5] Checking required packages...")
+    required_packages = [
+        'PIL',
+        'cv2',
+        'numpy',
+        'pandas',
+        'torch',
+        'transformers'
+    ]
+    
+    missing_packages = []
+    for pkg in required_packages:
+        try:
+            __import__(pkg)
+            print(f"  ✓ {pkg}")
+        except ImportError:
+            print(f"  ✗ {pkg} (missing)")
+            missing_packages.append(pkg)
+    
+    if missing_packages:
+        print(f"\n  ⚠ Missing packages: {', '.join(missing_packages)}")
+        print(f"     Run: pip install -r requirements_huatuogpt.txt")
 
-    print("\n=== Setup Complete! You are ready to run experiments. ===")
+    # 4. 데이터 다운로드 스크립트 실행 (선택적)
+    print("\n[4/5] Dataset preparation...")
+    if os.path.exists('data/download_data.sh'):
+        response = input("  Found data/download_data.sh. Download data now? (y/n): ").lower()
+        if response == 'y':
+            print("  Running data download script...")
+            run_command("bash data/download_data.sh")
+        else:
+            print("  Skipped data download. You can run it manually later.")
+    else:
+        print("  ⚠ data/download_data.sh not found.")
+        print("     Please ensure SLAKE dataset is in: data/slake/")
+        print("     - data/slake/images/")
+        print("     - data/slake/questions.json")
+
+    # 5. .gitkeep 생성 (빈 폴더 유지를 위해)
+    print("\n[5/5] Creating .gitkeep files...")
+    gitkeep_paths = [
+        'results/.gitkeep',
+        'checkpoints/.gitkeep'
+    ]
+    for path in gitkeep_paths:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as f:
+            pass
+        print(f"  ✓ Created: {path}")
+
+    print("\n" + "=" * 60)
+    print("✓ Setup Complete!")
+    print("=" * 60)
+    print("\nNext steps:")
+    print("1. Prepare SLAKE dataset files:")
+    print("   - Place images in: data/slake/images/")
+    print("   - Place metadata in: data/slake/questions.json")
+    print("\n2. Install dependencies:")
+    print("   - pip install -r requirements_base.txt")
+    print("   - pip install -r requirements_huatuogpt.txt")
+    print("\n3. Run the experiment:")
+    print("   - python scripts/run_slake_exp.py")
+    print("=" * 60)
 
 if __name__ == "__main__":
     main()
