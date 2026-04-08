@@ -52,8 +52,8 @@ class HuatuoInference:
                 trust_remote_code=True
             )
             
-            # 2. VLM 전용 모델 로드 (AutoModelForVision2Seq 사용)
-            self.model = AutoModelForVision2Seq.from_pretrained(
+            # 2. VLM 전용 모델 로드 (AutoModelForCausalLM 사용)
+            self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                 device_map="auto", # 4090 메모리 관리를 위해 auto 권장
@@ -61,7 +61,7 @@ class HuatuoInference:
             )
             self.model.eval()
             
-            print("✓ Model loaded successfully (Transformers + Vision2Seq)")
+            print("✓ Model loaded successfully (Transformers + CausalLM)")
             
         except Exception as e:
             print(f"❌ Error: Could not load model ({e})")

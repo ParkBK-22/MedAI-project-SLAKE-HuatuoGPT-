@@ -1,6 +1,11 @@
 import os
+import sys
 import matplotlib.pyplot as plt
 from PIL import Image
+
+# 프로젝트 루트 경로 추가
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.perturbations import ImagePerturber
 
 def main():

@@ -5,12 +5,16 @@ SLAKE 실험 결과 상세 분석 스크립트
 """
 
 import os
+import sys
 import yaml
 import pandas as pd
 import numpy as np
 from pathlib import Path
 import json
 import warnings
+
+# 프로젝트 루트 경로 추가
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # NumPy 호환성 경고 무시
 warnings.filterwarnings('ignore', category=UserWarning)

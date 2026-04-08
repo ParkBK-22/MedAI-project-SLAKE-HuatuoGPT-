@@ -1,4 +1,5 @@
 import os
+import sys
 import yaml
 import torch
 import pandas as pd
@@ -6,6 +7,9 @@ import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
 import warnings
+
+# 프로젝트 루트 경로 추가 (부모 디렉토리)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # NumPy 호환성 경고 무시
 warnings.filterwarnings('ignore', category=UserWarning)
