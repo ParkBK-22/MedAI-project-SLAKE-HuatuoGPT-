@@ -1,6 +1,10 @@
 import numpy as np
 import cv2
 from PIL import Image
+import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
 
 class ImagePerturber:
     def __init__(self, lpf_sigma=3, hpf_sigma=25, patch_size=16):

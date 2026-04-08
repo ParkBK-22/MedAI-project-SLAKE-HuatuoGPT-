@@ -1,12 +1,37 @@
 import os
 import subprocess
 import sys
+import warnings
 
-def run_command(command, shell_type="powershell"):
-    """터미널 명령어를 실행하고 결과를 출력합니다."""
-    print(f"Executing: {command}")
+# NumPy 호환성 경고 무시 (PyTorch 로드 전에 설정)
+warnings.filterwarnings('ignore', category=UserWarning, module='torch')
+warnings.filterwarnings("ignore")
+
+def run_command(command, shell_type="powershell", suppress_output=False):
+    """
+    터미널 명령어를 실행합니다.
+    
+    Args:
+        command: 실행할 명령어
+        shell_type: 쉘 타입 (기본값: powershell)
+        suppress_output: True면 출력을 최소화 (다운로드 등 장시간 작업용)
+    """
+    if not suppress_output:
+        print(f"Executing: {command}")
+    
     try:
-        subprocess.run(command, shell=True, check=True)
+        if suppress_output:
+            # 출력 억제 (진행 중일 때 진행 메시지만 표시)
+            subprocess.run(
+                command,
+                shell=True,
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            print("  ✓ Download completed!")
+        else:
+            subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while executing: {command}")
         print(e)
@@ -75,8 +100,8 @@ def main():
     if os.path.exists('data/download_data.sh'):
         response = input("  Found data/download_data.sh. Download data now? (y/n): ").lower()
         if response == 'y':
-            print("  Running data download script...")
-            run_command("bash data/download_data.sh")
+            print("  Running data download script (verbose output suppressed)...")
+            run_command("bash data/download_data.sh", suppress_output=True)
         else:
             print("  Skipped data download. You can run it manually later.")
     else:

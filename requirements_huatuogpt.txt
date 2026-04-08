@@ -10,5 +10,6 @@ PyYAML
 opencv-python
 pandas
 tqdm
+numpy<2.0  # PyTorch NumPy 호환성 문제 해결
 # 모델의 forward() 패치가 필요한 경우 (일부 LLaVA 기반 모델용)
 accelerate>=0.29.0

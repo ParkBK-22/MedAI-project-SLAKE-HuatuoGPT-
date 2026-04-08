@@ -10,6 +10,10 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 import json
+import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
 
 def load_results(results_dir="results"):
     """결과 파일 로드"""

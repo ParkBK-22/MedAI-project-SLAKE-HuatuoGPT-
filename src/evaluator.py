@@ -1,4 +1,8 @@
 import re
+import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
 
 class SlakeEvaluator:
     @staticmethod

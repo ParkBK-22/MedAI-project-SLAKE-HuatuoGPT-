@@ -7,6 +7,9 @@ import torch
 from transformers import AutoProcessor, AutoModelForCausalLM, AutoTokenizer
 from PIL import Image
 import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings("ignore")
 
 class HuatuoInference:

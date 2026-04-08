@@ -5,6 +5,11 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
+import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
+
 from src.perturbations import ImagePerturber
 from src.dataset_slake import SlakeDataset
 from src.evaluator import SlakeEvaluator

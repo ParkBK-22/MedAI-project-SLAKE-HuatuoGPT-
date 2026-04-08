@@ -1,6 +1,10 @@
 import json
 import os
 from PIL import Image
+import warnings
+
+# NumPy 호환성 경고 무시
+warnings.filterwarnings('ignore', category=UserWarning)
 
 class SlakeDataset:
     def __init__(self, json_path, img_dir):
