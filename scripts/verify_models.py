@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForVision2Seq, AutoProcessor
+from transformers import AutoModelForCausalLM, AutoProcessor
 from PIL import Image
 
 def main():
@@ -10,7 +10,7 @@ def main():
         # 1. 모델 및 프로세서 로드 (LLaVA-Qwen2 구조 최적화)
         # AutoProcessor는 이미지 전처리와 토큰화를 한 번에 처리합니다.
         processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
-        model = AutoModelForVision2Seq.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_id, 
             torch_dtype=torch.float16, # 4090에서는 float16이 안정적입니다.
             device_map="auto", 
