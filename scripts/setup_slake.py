@@ -2,38 +2,70 @@ import os
 import subprocess
 import sys
 import warnings
+import re
+from tqdm import tqdm
 
 # NumPy 호환성 경고 무시 (PyTorch 로드 전에 설정)
 warnings.filterwarnings('ignore', category=UserWarning, module='torch')
 warnings.filterwarnings("ignore")
 
-def run_command(command, shell_type="powershell", suppress_output=False):
+def run_command(command, shell_type="powershell", show_progress=False):
     """
     터미널 명령어를 실행합니다.
     
     Args:
         command: 실행할 명령어
         shell_type: 쉘 타입 (기본값: powershell)
-        suppress_output: True면 출력을 최소화 (다운로드 등 장시간 작업용)
+        show_progress: True면 진행 게이지 표시 (다운로드용)
     """
-    if not suppress_output:
+    if not show_progress:
         print(f"Executing: {command}")
     
     try:
-        if suppress_output:
-            # 출력 억제 (진행 중일 때 진행 메시지만 표시)
-            subprocess.run(
+        if show_progress:
+            # 진행률 표시와 함께 실행
+            process = subprocess.Popen(
                 command,
                 shell=True,
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1
             )
-            print("  ✓ Download completed!")
+            
+            file_count = 0
+            pbar = None
+            
+            for line in process.stdout:
+                # 폴더 경로 감지 (예: ./imgs/xmlab99:)
+                if re.match(r'\./imgs/\w+:', line.strip()):
+                    file_count += 1
+                    
+                    # 첫 번째 파일일 때 progress bar 초기화
+                    if pbar is None:
+                        pbar = tqdm(
+                            total=1300,  # 예상 총 파일 수
+                            desc="⏳ Downloading",
+                            unit="file",
+                            ncols=80,
+                            leave=True
+                        )
+                    
+                    pbar.update(1)
+            
+            process.wait()
+            
+            if pbar:
+                pbar.close()
+            
+            if process.returncode == 0:
+                print(f"✓ Download completed! ({file_count} files)")
+            else:
+                raise subprocess.CalledProcessError(process.returncode, command)
         else:
             subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error occurred while executing: {command}")
+        print(f"\nError occurred while executing: {command}")
         print(e)
         return False
     return True
@@ -100,8 +132,8 @@ def main():
     if os.path.exists('data/download_data.sh'):
         response = input("  Found data/download_data.sh. Download data now? (y/n): ").lower()
         if response == 'y':
-            print("  Running data download script (verbose output suppressed)...")
-            run_command("bash data/download_data.sh", suppress_output=True)
+            print("  Running data download script...")
+            run_command("bash data/download_data.sh", show_progress=True)
         else:
             print("  Skipped data download. You can run it manually later.")
     else:
