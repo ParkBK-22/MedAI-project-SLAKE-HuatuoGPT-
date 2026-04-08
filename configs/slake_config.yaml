@@ -2,10 +2,10 @@
 project_name: "SLAKE-Huatuo-Perturbation"
 seed: 42
 
-# 경로 설정 (Vast.ai 환경 기준)
+# 경로 설정
 data:
-  json_path: "./data/slake/questions.json"
-  img_dir: "./data/slake/images"
+  json_path: "./data/slake/train.json"
+  img_dir: "./data/slake/imgs"
   output_dir: "./results"
 
 # 모델 설정
