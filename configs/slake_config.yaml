@@ -10,10 +10,10 @@ data:
 
 # 모델 설정
 model:
-  name: "FreedomIntelligence/HuatuoGPT-Vision-7B"
+  name: "llava-hf/llava-1.5-7b-hf"  # LLaVA 공식 모델 (llava_qwen2 호환성 제거)
   device: "cuda"
-  max_new_tokens: 20  # 단답형 제한
-  temperature: 0.0    # Greedy decoding (결정적)
+  max_new_tokens: 20
+  temperature: 0.0
   prompt_template: "<|user|>\n<image>\n{question}\nAnswer the question concisely in a single word or short phrase.\n<|assistant|>\n"
 
 # 이미지 변형 파라미터
