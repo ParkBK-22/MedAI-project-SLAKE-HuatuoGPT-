@@ -103,7 +103,7 @@ def run_experiment(config_path):
     
     # 3. 모델 로드
     print("\nLoading model...")
-    model = HuatuoInference(cfg, device=cfg['model']['device'])
+    model = HuatuoInference(cfg, device=cfg['model']['device'], use_official_cli=False)
     print(f"  ✓ HuatuoGPT-Vision initialized")
     
     results = []
