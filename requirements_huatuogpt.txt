@@ -20,3 +20,6 @@ tqdm
 numpy<2.0
 peft
 protobuf
+
+# HuggingFace Hub (모델 다운로드 & 토큰 관리)
+huggingface-hub>=0.21.0

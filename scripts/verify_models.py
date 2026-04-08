@@ -11,6 +11,16 @@ import warnings
 # 프로젝트 루트 경로 추가
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# HuggingFace 토큰 설정
+hf_token = os.getenv('HF_TOKEN')
+if hf_token:
+    os.environ['HF_TOKEN'] = hf_token
+    try:
+        from huggingface_hub import login
+        login(token=hf_token, add_to_git_credential=False)
+    except:
+        pass
+
 # 경고 무시
 warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)

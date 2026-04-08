@@ -159,12 +159,26 @@ def verify_dataset(data_dir):
 
 
 def main():
-    print("\n" + "=" * 70)
-    print("🚀 SLAKE PROJECT SETUP & DATASET PREPARATION")
-    print("=" * 70)
-
     # 1. 필수 폴더 생성
-    print("\n[1/6] Creating directories...")
+    print("\n[1/7] Setting up HuggingFace token...")
+    import os
+    hf_token = os.getenv('HF_TOKEN')
+    if not hf_token:
+        print("  ⚠️  HF_TOKEN not set!")
+        print("  Set it with:")
+        print("    # Linux/Mac:")
+        print("    export HF_TOKEN='your_token_here'")
+        print("    # Windows PowerShell:")
+        print("    $env:HF_TOKEN='your_token_here'")
+        print("  Or login with: huggingface-cli login")
+        response = input("\n  Continue without HF_TOKEN? (y/n): ").lower()
+        if response != 'y':
+            print("  Exiting...")
+            return
+    else:
+        print(f"  ✓ HF_TOKEN is set")
+    
+    print("\n[2/7] Creating directories...")
     folders = [
         'data/slake',
         'results',
@@ -176,7 +190,7 @@ def main():
         print(f"  ✓ {folder}")
 
     # 2. 환경 검증
-    print("\n[2/6] Verifying PyTorch & CUDA...")
+    print("\n[3/7] Verifying PyTorch & CUDA...")
     try:
         import torch
         print(f"  ✓ PyTorch: {torch.__version__}")
@@ -189,7 +203,7 @@ def main():
         print("  ⚠ PyTorch not installed. Run: pip install -r requirements_huatuogpt.txt")
 
     # 3. 패키지 확인
-    print("\n[3/6] Checking required packages...")
+    print("\n[4/7] Checking required packages...")
     required_packages = ['PIL', 'cv2', 'numpy', 'pandas', 'yaml', 'transformers']
     missing = []
     
@@ -205,7 +219,7 @@ def main():
         print(f"\n  ⚠ Install missing packages: pip install -r requirements_huatuogpt.txt")
 
     # 4. 데이터셋 처리
-    print("\n[4/6] Dataset preparation...")
+    print("\n[5/7] Dataset preparation...")
     
     data_dir = "data/slake"
     
@@ -227,14 +241,14 @@ def main():
         print("  • No ZIP files found in data/slake")
 
     # 5. 데이터셋 검증
-    print("\n[5/6] Verifying dataset...")
+    print("\n[6/7] Verifying dataset...")
     if verify_dataset(data_dir):
         print("  ✓ Dataset structure is complete!")
     else:
         print("  ⚠ Some files are missing. Please download the SLAKE dataset manually.")
 
     # 6. .gitkeep 생성
-    print("\n[6/6] Creating .gitkeep files...")
+    print("\n[7/7] Creating .gitkeep files...")
     for folder in ['results', 'checkpoints']:
         gitkeep = os.path.join(folder, '.gitkeep')
         os.makedirs(os.path.dirname(gitkeep), exist_ok=True)

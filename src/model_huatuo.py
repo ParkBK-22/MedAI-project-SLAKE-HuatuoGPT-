@@ -3,13 +3,31 @@ HuatuoGPT-Vision 모델 래퍼 (최신 Transformers 4.42+ 호환 버전)
 """
 
 import torch
+import os
 from transformers import AutoProcessor, AutoModelForCausalLM
+from huggingface_hub import login
 from PIL import Image
 import warnings
 
 # NumPy 호환성 경고 무시
 warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings("ignore")
+
+# HuggingFace 토큰 자동 설정
+def setup_hf_token():
+    """HuggingFace 토큰 설정 (환경변수 또는 캐시에서)"""
+    hf_token = os.getenv('HF_TOKEN')
+    if hf_token:
+        try:
+            login(token=hf_token, add_to_git_credential=False)
+            print("✓ HuggingFace token authenticated")
+        except Exception as e:
+            print(f"⚠ HF token setup failed: {e}")
+    else:
+        print("⚠ HF_TOKEN not set. Model download may be rate-limited.")
+        print("  Set: export HF_TOKEN='your_token' or huggingface-cli login")
+
+setup_hf_token()
 
 class HuatuoInference:
     def __init__(self, config, device="cuda", use_official_cli=False):
@@ -47,24 +65,35 @@ class HuatuoInference:
             self.bot = None
             
             # 1. Processor 로드 (이미지 + 텍스트 통합 처리)
+            print("  📥 Loading processor...")
             self.processor = AutoProcessor.from_pretrained(
                 self.model_name,
-                trust_remote_code=True
+                trust_remote_code=True,
+                cache_dir=None  # 캐시 비활성화로 최신 다운로드
             )
             
-            # 2. VLM 전용 모델 로드 (AutoModelForCausalLM 사용)
+            # 2. VLM 전용 모델 로드 (CPU에서 먼저 로드 후 GPU로 이동)
+            print("  📥 Loading model on CPU first...")
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
-                device_map="auto", # 4090 메모리 관리를 위해 auto 권장
-                trust_remote_code=True
+                torch_dtype=torch.float32,  # CPU에서는 float32 사용
+                device_map="cpu",  # CPU에서 먼저 로드
+                trust_remote_code=True,
+                cache_dir=None
             )
+            
+            # GPU로 이동
+            print("  🚀 Moving model to GPU...")
+            if self.device == "cuda":
+                self.model = self.model.to(torch.float16).cuda()
+            
             self.model.eval()
             
-            print("✓ Model loaded successfully (Transformers + CausalLM)")
+            print("✓ Model loaded successfully (CPU → GPU conversion)")
             
         except Exception as e:
-            print(f"❌ Error: Could not load model ({e})")
+            print(f"❌ Error: Could not load model ({type(e).__name__}: {str(e)[:100]})")
+            print("\n💡 Alternative: Using mock inference for testing...")
             self.model = None
             self.processor = None
 

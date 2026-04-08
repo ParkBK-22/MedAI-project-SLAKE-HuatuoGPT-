@@ -52,14 +52,52 @@ pip install git+https://github.com/huggingface/transformers.git --upgrade
 pip install -r requirements_huatuogpt.txt
 ```
 
-### 1.6 환경 검증
+### 1.5 HuggingFace 토큰 설정 (필수!)
+
 ```bash
-python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.cuda.is_available()}')"
+# 방법 1: 환경변수로 설정 (권장)
+# Linux/Mac
+export HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxx"
+
+# Windows PowerShell
+$env:HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxx"
+
+# 방법 2: HuggingFace CLI로 로그인
+huggingface-cli login
+# → https://huggingface.co/settings/tokens 에서 토큰 생성 후 입력
+
+# 방법 3: Python에서 설정
+python -c "from huggingface_hub import login; login(token='hf_xxxxxxxxxxxxxxxxxxxx')"
 ```
+
+**토큰 생성:**
+1. [HuggingFace 토큰 페이지](https://huggingface.co/settings/tokens) 방문
+2. "New token" 클릭
+3. 권한: `read` 선택
+4. 토큰 복사 (시작: `hf_`)
+5. 터미널에 `HF_TOKEN` 설정
 
 ---
 
 ## 2. 프로젝트 설정
+
+**HuggingFace 토큰이 설정되어 있는지 확인:**
+
+```bash
+# 환경변수 확인
+# Linux/Mac
+echo $HF_TOKEN
+
+# Windows PowerShell
+$env:HF_TOKEN
+```
+
+**토큰이 없으면 설정:**
+```bash
+export HF_TOKEN="hf_your_token_here"
+```
+
+**프로젝트 설정 실행:**
 
 ```bash
 # 디렉토리 생성 및 초기 설정
